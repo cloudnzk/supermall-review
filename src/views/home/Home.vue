@@ -1,13 +1,18 @@
 <template>
   <div>
-    首页
+    <nav-bar class="home-nav">
+      <div slot="center">购物街</div>
+    </nav-bar>
   </div>
 </template>
 <script>
+  import NavBar from 'components/common/navbar/NavBar'
   export default {
     name:'',
     mixins: [],
-    components: {},
+    components: {
+      NavBar,
+    },
     props:{},
     data () {
       return {
@@ -23,5 +28,8 @@
   }
 </script>
 <style scoped>
-
+  .home-nav {
+    background-color: var(--color-tint);
+    color: #fff;
+  }
 </style>
