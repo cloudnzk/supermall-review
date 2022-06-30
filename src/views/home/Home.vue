@@ -7,6 +7,7 @@
 </template>
 <script>
   import NavBar from 'components/common/navbar/NavBar'
+  import {getHomeMultidata} from 'network/home'
   export default {
     name:'',
     mixins: [],
@@ -16,15 +17,30 @@
     props:{},
     data () {
       return {
-
+        banners: [],
+        recommends: [],
       };
     },
     computed: {},
     watch: {},
-    created() {},
+    created() {
+      this.getHomeMultidata()
+    },
     mounted() {},
     destroyed() {},
-    methods: {},
+    methods: {
+      /**
+       * 网络请求相关的方法
+       */
+      /* 多封装一层，一般不在created()里面写具体实现 */
+      async getHomeMultidata(){
+        const res = await getHomeMultidata()
+        console.log(res);
+        // 保存数据
+        this.banners = res.data.banner.list
+        this.recommends = res.data.recommend.list
+      }
+    },
   }
 </script>
 <style scoped>
