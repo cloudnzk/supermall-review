@@ -9,7 +9,7 @@
           <img :src="item.image" alt="">
         </a>
       </swiper-slide>
-      <div class="swiper-pagination-white" slot="pagination"></div>
+      <div class="swiper-pagination swiper-pagination-white" slot="pagination"></div>
     </swiper>
   </div>
 </template>
