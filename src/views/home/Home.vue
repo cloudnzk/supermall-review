@@ -33,7 +33,20 @@
       return {
         banners: [],
         recommends: [],
-        titles: ['流行','新款','精选']
+        titles: ['流行','新款','精选'],
+        /* 保存商品数据的数据结构设计：保存页码和商品列表
+        goods:{
+          goodsType: {
+            page: 0
+            list: []
+          }
+        }
+        */
+        goods: {
+          'pop': {page: 0, list:[]},
+          'news': {page: 0, list:[]},
+          'sell': {page: 0, list:[]},
+        }
       };
     },
     computed: {},
