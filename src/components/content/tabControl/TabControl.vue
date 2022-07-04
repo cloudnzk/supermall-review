@@ -36,6 +36,10 @@ export default {
   methods: {
     itemClick(index){
       this.currentIndex = index
+
+      // 父子组件通信之子传父，将数据传到 Home 组件
+      // 第一个参数：自定义事件名，第二个参数：要传递的数据
+      this.$emit('tabClick', this.currentIndex)
     }
   },
 };

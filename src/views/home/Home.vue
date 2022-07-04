@@ -6,20 +6,24 @@
     <home-swiper :banners="banners"/>
     <recommend-view :recommends="recommends"/>
     <!-- <feature-view/> -->
-    <tab-control :titles="titles" />
+    <!-- 子组件传给父组件的数据，在模板里不用再给监听的方法传参数。例如，tabClick(index)反而会出错 -->
+    <tab-control class="tab-control"
+    :titles="titles" @tabClick="tabClick"/>
+    <goods-list :goods="showGoods"/>
   </div>
 </template>
 <script>
   import NavBar from 'components/common/navbar/NavBar'
   import TabControl from '../../components/content/tabControl/TabControl'
+  import GoodsList from '../../components/content/goods/GoodsList'
 
   import HomeSwiper from './childComps/HomeSwiper'
   import RecommendView from './childComps/RecommendView'
   // import FeatureView from './childComps/FeatureView'
 
-  import {getHomeMultidata} from 'network/home'
+  import {getHomeMultidata,getHomeGoods} from 'network/home'
   export default {
-    name:'',
+    name:'Home',
     mixins: [],
     components: {
       NavBar,
@@ -27,6 +31,7 @@
       RecommendView,
       // FeatureView,
       TabControl,
+      GoodsList,
     },
     props:{},
     data () {
@@ -44,15 +49,26 @@
         */
         goods: {
           'pop': {page: 0, list:[]},
-          'news': {page: 0, list:[]},
+          'new': {page: 0, list:[]},
           'sell': {page: 0, list:[]},
-        }
+        },
+
+        currentType: 'pop'
       };
     },
-    computed: {},
+    computed: {
+      showGoods(){
+        return this.goods[this.currentType].list
+      }
+    },
     watch: {},
     created() {
+      // 调用组件定义的方法时，必须使用this。不然使用的是引入的网络请求函数
       this.getHomeMultidata()
+
+      this.getHomeGoods('pop')
+      this.getHomeGoods('new')
+      this.getHomeGoods('sell')
     },
     mounted() {},
     destroyed() {},
@@ -63,10 +79,28 @@
       /* 多封装一层，一般不在created()里面写具体实现 */
       async getHomeMultidata(){
         const res = await getHomeMultidata()
-        console.log(res);
+        // console.log(res);
         // 保存数据
         this.banners = res.data.banner.list
         this.recommends = res.data.recommend.list
+      },
+
+      // 请求商品数据的方法，每请求完1页将该页的数据加入列表，并递增页码
+      async getHomeGoods(type){
+        const page = this.goods[type].page + 1
+        const res = await getHomeGoods(type, page)
+
+        this.goods[type].list.push(...res.data.list)
+        this.goods[type].page += 1
+      },
+
+      /*
+      * 事件监听相关的方法
+      */
+      tabClick(index){
+        if(index === 0) this.currentType = 'pop'
+        else if(index === 1)  this.currentType = 'new'
+        else  this.currentType = 'sell'
       }
     },
   }
@@ -75,5 +109,10 @@
   .home-nav {
     background-color: var(--color-tint);
     color: #fff;
+  }
+
+  .tab-control {
+    position: relative;
+    z-index: 9;
   }
 </style>
