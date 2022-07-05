@@ -1,45 +1,49 @@
 <template>
-  <div>
+  <div id="home">
     <nav-bar class="home-nav">
       <div slot="center">购物街</div>
     </nav-bar>
-    <home-swiper :banners="banners"/>
-    <recommend-view :recommends="recommends"/>
-    <!-- <feature-view/> -->
-    <!-- 子组件传给父组件的数据，在模板里不用再给监听的方法传参数。例如，tabClick(index)反而会出错 -->
-    <tab-control class="tab-control"
-    :titles="titles" @tabClick="tabClick"/>
-    <goods-list :goods="showGoods"/>
+    <!-- content 样式会被加到自定义组件的根div上 -->
+    <scroll class="content">
+      <home-swiper :banners="banners" />
+      <recommend-view :recommends="recommends" />
+      <!-- <feature-view/> -->
+      <!-- 子组件传给父组件的数据，在模板里不用再给监听的方法传参数。例如，tabClick(index)反而会出错 -->
+      <tab-control class="tab-control" :titles="titles" @tabClick="tabClick" />
+      <goods-list :goods="showGoods" />
+    </scroll>
   </div>
 </template>
 <script>
-  import NavBar from 'components/common/navbar/NavBar'
-  import TabControl from '../../components/content/tabControl/TabControl'
-  import GoodsList from '../../components/content/goods/GoodsList'
+import NavBar from "components/common/navbar/NavBar";
+import TabControl from "../../components/content/tabControl/TabControl";
+import GoodsList from "../../components/content/goods/GoodsList";
+import Scroll from "../../components/common/scroll/Scroll";
 
-  import HomeSwiper from './childComps/HomeSwiper'
-  import RecommendView from './childComps/RecommendView'
-  // import FeatureView from './childComps/FeatureView'
+import HomeSwiper from "./childComps/HomeSwiper";
+import RecommendView from "./childComps/RecommendView";
+// import FeatureView from './childComps/FeatureView'
 
-  import {getHomeMultidata,getHomeGoods} from 'network/home'
-  export default {
-    name:'Home',
-    mixins: [],
-    components: {
-      NavBar,
-      HomeSwiper,
-      RecommendView,
-      // FeatureView,
-      TabControl,
-      GoodsList,
-    },
-    props:{},
-    data () {
-      return {
-        banners: [],
-        recommends: [],
-        titles: ['流行','新款','精选'],
-        /* 保存商品数据的数据结构设计：保存页码和商品列表
+import { getHomeMultidata, getHomeGoods } from "network/home";
+export default {
+  name: "Home",
+  mixins: [],
+  components: {
+    NavBar,
+    HomeSwiper,
+    RecommendView,
+    // FeatureView,
+    TabControl,
+    GoodsList,
+    Scroll,
+  },
+  props: {},
+  data() {
+    return {
+      banners: [],
+      recommends: [],
+      titles: ["流行", "新款", "精选"],
+      /* 保存商品数据的数据结构设计：保存页码和商品列表
         goods:{
           goodsType: {
             page: 0
@@ -47,72 +51,86 @@
           }
         }
         */
-        goods: {
-          'pop': {page: 0, list:[]},
-          'new': {page: 0, list:[]},
-          'sell': {page: 0, list:[]},
-        },
-
-        currentType: 'pop'
-      };
-    },
-    computed: {
-      showGoods(){
-        return this.goods[this.currentType].list
-      }
-    },
-    watch: {},
-    created() {
-      // 调用组件定义的方法时，必须使用this。不然使用的是引入的网络请求函数
-      this.getHomeMultidata()
-
-      this.getHomeGoods('pop')
-      this.getHomeGoods('new')
-      this.getHomeGoods('sell')
-    },
-    mounted() {},
-    destroyed() {},
-    methods: {
-      /**
-       * 网络请求相关的方法
-       */
-      /* 多封装一层，一般不在created()里面写具体实现 */
-      async getHomeMultidata(){
-        const res = await getHomeMultidata()
-        // console.log(res);
-        // 保存数据
-        this.banners = res.data.banner.list
-        this.recommends = res.data.recommend.list
+      goods: {
+        pop: { page: 0, list: [] },
+        new: { page: 0, list: [] },
+        sell: { page: 0, list: [] },
       },
 
-      // 请求商品数据的方法，每请求完1页将该页的数据加入列表，并递增页码
-      async getHomeGoods(type){
-        const page = this.goods[type].page + 1
-        const res = await getHomeGoods(type, page)
-
-        this.goods[type].list.push(...res.data.list)
-        this.goods[type].page += 1
-      },
-
-      /*
-      * 事件监听相关的方法
-      */
-      tabClick(index){
-        if(index === 0) this.currentType = 'pop'
-        else if(index === 1)  this.currentType = 'new'
-        else  this.currentType = 'sell'
-      }
+      currentType: "pop",
+    };
+  },
+  computed: {
+    showGoods() {
+      return this.goods[this.currentType].list;
     },
-  }
+  },
+  watch: {},
+  created() {
+    // 调用组件定义的方法时，必须使用this。不然使用的是引入的网络请求函数
+    this.getHomeMultidata();
+
+    this.getHomeGoods("pop");
+    this.getHomeGoods("new");
+    this.getHomeGoods("sell");
+  },
+  mounted() {},
+  destroyed() {},
+  methods: {
+    /**
+     * 网络请求相关的方法
+     */
+    /* 多封装一层，一般不在created()里面写具体实现 */
+    async getHomeMultidata() {
+      const res = await getHomeMultidata();
+      // console.log(res);
+      // 保存数据
+      this.banners = res.data.banner.list;
+      this.recommends = res.data.recommend.list;
+    },
+
+    // 请求商品数据的方法，每请求完1页将该页的数据加入列表，并递增页码
+    async getHomeGoods(type) {
+      const page = this.goods[type].page + 1;
+      const res = await getHomeGoods(type, page);
+
+      this.goods[type].list.push(...res.data.list);
+      this.goods[type].page += 1;
+    },
+
+    /*
+     * 事件监听相关的方法
+     */
+    tabClick(index) {
+      if (index === 0) this.currentType = "pop";
+      else if (index === 1) this.currentType = "new";
+      else this.currentType = "sell";
+    },
+  },
+};
 </script>
 <style scoped>
-  .home-nav {
-    background-color: var(--color-tint);
-    color: #fff;
-  }
+#home {
+  position: relative;
+  height: 100vh;
+}
+.home-nav {
+  background-color: var(--color-tint);
+  color: #fff;
+}
 
-  .tab-control {
-    position: relative;
-    z-index: 9;
-  }
+.tab-control {
+  position: relative;
+  z-index: 9;
+}
+
+.content {
+  overflow: hidden;
+  /* position: absolute;
+  top: 44px;
+  bottom: 49px;
+  left: 0;
+  right: 0; */
+  height: calc(100% - 44px - 49px);
+}
 </style>
