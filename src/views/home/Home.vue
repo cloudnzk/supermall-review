@@ -4,7 +4,10 @@
       <div slot="center">购物街</div>
     </nav-bar>
     <!-- content 样式会被加到自定义组件的根div上 -->
-    <scroll class="content">
+    <scroll class="content" ref="scroll"
+    @scroll="contentScroll"
+    :probe-type="3"
+    >
       <home-swiper :banners="banners" />
       <recommend-view :recommends="recommends" />
       <!-- <feature-view/> -->
@@ -12,13 +15,17 @@
       <tab-control class="tab-control" :titles="titles" @tabClick="tabClick" />
       <goods-list :goods="showGoods" />
     </scroll>
+    <!-- 监听一个组件的原生事件，需要加上 .native 修饰符 -->
+    <back-top @click.native="backClick" v-show="isShowBackTop" />
   </div>
 </template>
 <script>
 import NavBar from "components/common/navbar/NavBar";
+import Scroll from "../../components/common/scroll/Scroll";
+
 import TabControl from "../../components/content/tabControl/TabControl";
 import GoodsList from "../../components/content/goods/GoodsList";
-import Scroll from "../../components/common/scroll/Scroll";
+import BackTop from "../../components/content/backTop/BackTop";
 
 import HomeSwiper from "./childComps/HomeSwiper";
 import RecommendView from "./childComps/RecommendView";
@@ -36,6 +43,7 @@ export default {
     TabControl,
     GoodsList,
     Scroll,
+    BackTop,
   },
   props: {},
   data() {
@@ -58,6 +66,7 @@ export default {
       },
 
       currentType: "pop",
+      isShowBackTop: false,
     };
   },
   computed: {
@@ -105,6 +114,16 @@ export default {
       if (index === 0) this.currentType = "pop";
       else if (index === 1) this.currentType = "new";
       else this.currentType = "sell";
+    },
+
+    // 返回顶部
+    backClick(){
+      this.$refs.scroll.scrollTo(0,0)
+    },
+
+    // 监听页面滚动
+    contentScroll(position){
+      this.isShowBackTop = -position.y > 1000
     },
   },
 };
