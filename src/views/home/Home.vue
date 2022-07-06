@@ -3,6 +3,14 @@
     <nav-bar class="home-nav">
       <div slot="center">购物街</div>
     </nav-bar>
+    <!-- 吸顶显示效果：在这里放一个tabControl，默认不显示。等到滚动到一定位置就吸顶显示 -->
+    <tab-control class="tab-control"
+          :titles="['流行','新款','精选']"
+          @tabClick="tabClick"
+          ref="tabControl1"
+          v-show="isTabFixed">
+    </tab-control>
+
     <!-- content 样式会被加到自定义组件的根div上 -->
     <scroll class="content" ref="scroll"
     @scroll="contentScroll"
@@ -10,11 +18,11 @@
     :pull-up-load="true"
     @pullingUp="loadMore"
     >
-      <home-swiper :banners="banners" />
+      <home-swiper :banners="banners" @swiperImageLoad="swiperImageLoad"/>
       <recommend-view :recommends="recommends" />
       <!-- <feature-view/> -->
       <!-- 子组件传给父组件的数据，在模板里不用再给监听的方法传参数。例如，tabClick(index)反而会出错 -->
-      <tab-control class="tab-control" :titles="titles" @tabClick="tabClick" />
+      <tab-control class="tab-control" :titles="titles" @tabClick="tabClick" ref="tabControl2"/>
       <goods-list :goods="showGoods" />
     </scroll>
     <!-- 监听一个组件的原生事件，需要加上 .native 修饰符 -->
@@ -71,6 +79,10 @@ export default {
 
       currentType: "pop",
       isShowBackTop: false,
+      // tabControl 的 offsetTop
+      tabOffsetTop: 0,
+      // tabControl 是否需要吸顶
+      isTabFixed: false,
     };
   },
   computed: {
@@ -129,6 +141,10 @@ export default {
       if (index === 0) this.currentType = "pop";
       else if (index === 1) this.currentType = "new";
       else this.currentType = "sell";
+
+      //让两个 tabControl 点击的位置同步
+      this.$refs.tabControl1.currentIndex = index
+      this.$refs.tabControl2.currentIndex = index
     },
 
     // 返回顶部
@@ -139,6 +155,9 @@ export default {
     // 监听页面滚动
     contentScroll(position){
       this.isShowBackTop = -position.y > 1000
+
+      // 决定 tabControl 是否吸顶
+      this.isTabFixed = -position.y > this.tabOffsetTop
     },
 
     // 上拉加载更多
@@ -153,7 +172,15 @@ export default {
       this.$bus.$on('itemImageLoad', () => {
         refresh()
       })
-    }
+    },
+
+    // 监听轮播图加载完成
+    swiperImageLoad(){
+        // 2.获取tabControl的offsetTop，滚动到多少时就吸顶
+        // 但图片没加载完成的时候，offsetTop计算不正确
+        // 所有的组件都有一个属性$el:用于获取组件中的元素
+        this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop;
+    },
   },
 };
 </script>
@@ -165,6 +192,17 @@ export default {
 .home-nav {
   background-color: var(--color-tint);
   color: #fff;
+
+  /*
+  * 在使用浏览器原生滚动时，为了让导航不跟随一起滚动。但这样会使 Navbar 脱标，后面跟着的元素会滚动到 Navbar 处
+  * 因此，使用 better-scroll 后限制滚动范围后，没必要再使用 fixed 定位的方式
+  */
+  /* position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 9; */
+
 }
 
 .tab-control {
