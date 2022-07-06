@@ -7,6 +7,8 @@
     <scroll class="content" ref="scroll"
     @scroll="contentScroll"
     :probe-type="3"
+    :pull-up-load="true"
+    @pullingUp="loadMore"
     >
       <home-swiper :banners="banners" />
       <recommend-view :recommends="recommends" />
@@ -105,6 +107,9 @@ export default {
 
       this.goods[type].list.push(...res.data.list);
       this.goods[type].page += 1;
+
+      // 数据保存完成，完成上拉加载更多，允许下一次上拉加载
+      this.$refs.scroll.finishPullUp()
     },
 
     /*
@@ -124,6 +129,11 @@ export default {
     // 监听页面滚动
     contentScroll(position){
       this.isShowBackTop = -position.y > 1000
+    },
+
+    // 上拉加载更多
+    loadMore(){
+        this.getHomeGoods(this.currentType)
     },
   },
 };

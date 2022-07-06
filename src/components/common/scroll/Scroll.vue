@@ -8,6 +8,9 @@
 <script>
 import BScroll from "@better-scroll/core";
 import ObserveDOM from "@better-scroll/observe-dom";
+import Pullup from "@better-scroll/pull-up";
+
+BScroll.use(Pullup);
 BScroll.use(ObserveDOM);
 
 export default {
@@ -18,6 +21,10 @@ export default {
     probeType: {
       type: Number,
       default: 0,
+    },
+    pullUpLoad: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -36,12 +43,20 @@ export default {
       // observeImage: true
       // 根据业务场景指定，暴露一个props给外界来决定是否实时监听。对页面的性能有影响.
       probeType: this.probeType,
+      pullUpLoad: this.pullUpLoad,
     });
 
     /* 2.监听滚动的位置 */
     if (this.probeType === 2 || this.probeType === 3) {
       this.scroll.on("scroll", (position) => {
         this.$emit("scroll", position);
+      });
+    }
+
+    // 监听上拉加载更多
+    if(this.pullUpLoad){
+      this.scroll.on("pullingUp",() => {
+        this.$emit('pullingUp')
       });
     }
   },
@@ -51,6 +66,11 @@ export default {
     scrollTo(x, y, delay = 300) {
       this.scroll.scrollTo(x, y, delay);
     },
+
+    // 完成本次上拉加载
+    finishPullUp(){
+      this.scroll.finishPullUp()
+    }
   },
 };
 </script>
