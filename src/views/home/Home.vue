@@ -34,7 +34,7 @@ import RecommendView from "./childComps/RecommendView";
 // import FeatureView from './childComps/FeatureView'
 
 import { getHomeMultidata, getHomeGoods } from "network/home";
-import {debounce} from "common/utils"
+import {debounce,throttle} from "common/utils"
 
 export default {
   name: "Home",
@@ -116,7 +116,10 @@ export default {
       this.goods[type].page += 1;
 
       // 数据保存完成，完成上拉加载更多，允许下一次上拉加载
-      this.$refs.scroll.finishPullUp()
+      // 上拉加载节流，3秒内最多一次上拉加载
+      const finishPullUp = throttle(this.$refs.scroll.finishPullUp, 3000)
+      finishPullUp()
+      // this.$refs.scroll.finishPullUp()
     },
 
     /*
@@ -171,11 +174,11 @@ export default {
 
 .content {
   overflow: hidden;
-  /* position: absolute;
+  position: absolute;
   top: 44px;
   bottom: 49px;
   left: 0;
-  right: 0; */
-  height: calc(100% - 44px - 49px);
+  right: 0;
+  /* height: calc(100% - 44px - 49px); */
 }
 </style>
