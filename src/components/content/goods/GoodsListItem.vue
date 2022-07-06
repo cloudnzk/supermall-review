@@ -1,6 +1,6 @@
 <template>
   <div class="goods-item">
-    <img :src="goodsItem.show.img" alt="">
+    <img :src="goodsItem.show.img" alt="" @load="imageLoad">
     <div class="goods-info">
       <p>{{goodsItem.title}}</p>
       <span class="price">{{goodsItem.price}}</span>
@@ -31,7 +31,12 @@
     created() {},
     mounted() {},
     destroyed() {},
-    methods: {},
+    methods: {
+      // 监听图片加载完成，并发送事件。目的是让 Home 组件监听
+      imageLoad(){
+        this.$bus.$emit('itemImageLoad')
+      }
+    },
   }
 </script>
 <style scoped>

@@ -34,6 +34,8 @@ import RecommendView from "./childComps/RecommendView";
 // import FeatureView from './childComps/FeatureView'
 
 import { getHomeMultidata, getHomeGoods } from "network/home";
+import {debounce} from "common/utils"
+
 export default {
   name: "Home",
   mixins: [],
@@ -84,8 +86,13 @@ export default {
     this.getHomeGoods("pop");
     this.getHomeGoods("new");
     this.getHomeGoods("sell");
+
   },
-  mounted() {},
+  mounted() {
+    // 监听图片加载的事件使用到了 this.$refs.scroll
+    // 所以这部分代码最好放在 mounted 里面，不然 scroll 有可能为空
+    this.imageLoad()
+  },
   destroyed() {},
   methods: {
     /**
@@ -135,6 +142,15 @@ export default {
     loadMore(){
         this.getHomeGoods(this.currentType)
     },
+
+    // 监听图片加载完成
+    imageLoad(){
+      // 刷新防抖
+      const refresh = debounce(this.$refs.scroll.refresh, 200)
+      this.$bus.$on('itemImageLoad', () => {
+        refresh()
+      })
+    }
   },
 };
 </script>
