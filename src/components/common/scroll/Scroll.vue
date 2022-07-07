@@ -56,9 +56,9 @@ export default {
     }
 
     // 监听上拉加载更多
-    if(this.pullUpLoad){
-      this.scroll.on("pullingUp",() => {
-        this.$emit('pullingUp')
+    if (this.pullUpLoad) {
+      this.scroll.on("pullingUp", () => {
+        this.$emit("pullingUp");
       });
     }
   },
@@ -70,17 +70,21 @@ export default {
     },
 
     // 完成本次上拉加载
-    finishPullUp(){
-      this.scroll && this.scroll.finishPullUp()
+    finishPullUp() {
+      this.scroll && this.scroll.finishPullUp();
     },
 
     /* 判断scroll对象存不存在
-    *  因为首页的数据有可能加载得很快，事件总线定义的事件很快触发，
-    *  而此时 this.scroll 可能还没创建好
-    */
-    refresh(){
-      this.scroll && this.scroll.refresh()
-    }
+     *  因为首页的数据有可能加载得很快，事件总线定义的事件很快触发，
+     *  而此时 this.scroll 可能还没创建好
+     */
+    refresh() {
+      this.scroll && this.scroll.refresh();
+    },
+
+    getCurrentY() {
+      return this.scroll ? this.scroll.y : 0;
+    },
   },
 };
 </script>

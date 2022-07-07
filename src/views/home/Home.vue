@@ -4,25 +4,34 @@
       <div slot="center">购物街</div>
     </nav-bar>
     <!-- 吸顶显示效果：在这里放一个tabControl，默认不显示。等到滚动到一定位置就吸顶显示 -->
-    <tab-control class="tab-control"
-          :titles="['流行','新款','精选']"
-          @tabClick="tabClick"
-          ref="tabControl1"
-          v-show="isTabFixed">
+    <tab-control
+      class="tab-control"
+      :titles="['流行', '新款', '精选']"
+      @tabClick="tabClick"
+      ref="tabControl1"
+      v-show="isTabFixed"
+    >
     </tab-control>
 
     <!-- content 样式会被加到自定义组件的根div上 -->
-    <scroll class="content" ref="scroll"
-    @scroll="contentScroll"
-    :probe-type="3"
-    :pull-up-load="true"
-    @pullingUp="loadMore"
+    <scroll
+      class="content"
+      ref="scroll"
+      @scroll="contentScroll"
+      :probe-type="3"
+      :pull-up-load="true"
+      @pullingUp="loadMore"
     >
-      <home-swiper :banners="banners" @swiperImageLoad="swiperImageLoad"/>
+      <home-swiper :banners="banners" @swiperImageLoad="swiperImageLoad" />
       <recommend-view :recommends="recommends" />
       <!-- <feature-view/> -->
       <!-- 子组件传给父组件的数据，在模板里不用再给监听的方法传参数。例如，tabClick(index)反而会出错 -->
-      <tab-control class="tab-control" :titles="titles" @tabClick="tabClick" ref="tabControl2"/>
+      <tab-control
+        class="tab-control"
+        :titles="titles"
+        @tabClick="tabClick"
+        ref="tabControl2"
+      />
       <goods-list :goods="showGoods" />
     </scroll>
     <!-- 监听一个组件的原生事件，需要加上 .native 修饰符 -->
@@ -42,7 +51,7 @@ import RecommendView from "./childComps/RecommendView";
 // import FeatureView from './childComps/FeatureView'
 
 import { getHomeMultidata, getHomeGoods } from "network/home";
-import {debounce,throttle} from "common/utils"
+import { debounce, throttle } from "common/utils";
 
 export default {
   name: "Home",
@@ -83,6 +92,9 @@ export default {
       tabOffsetTop: 0,
       // tabControl 是否需要吸顶
       isTabFixed: false,
+
+      // 保存首页的滚动位置
+      saveY: 0,
     };
   },
   computed: {
@@ -98,12 +110,27 @@ export default {
     this.getHomeGoods("pop");
     this.getHomeGoods("new");
     this.getHomeGoods("sell");
-
   },
   mounted() {
     // 监听图片加载的事件使用到了 this.$refs.scroll
     // 所以这部分代码最好放在 mounted 里面，不然 scroll 有可能为空
-    this.imageLoad()
+    this.imageLoad();
+  },
+
+  /* 使用 keep-alive 保存 Home 组件的状态 */
+  // 重新激活 Home 组件时，滚动到原来的位置
+  activated() {
+    this.$refs.scroll.scrollTo(0, this.saveY, 0);
+    this.$refs.scroll.refresh();
+  },
+
+  /* 离开 Home 组件时，保存离开的位置 */
+  deactivated() {
+    //1.保存Y值
+    this.saveY = this.$refs.scroll.getCurrentY();
+
+    //2.取消全局事件的监听
+    this.$bus.$off("itemImageLoad", this.itemImgListener);
   },
   destroyed() {},
   methods: {
@@ -129,8 +156,8 @@ export default {
 
       // 数据保存完成，完成上拉加载更多，允许下一次上拉加载
       // 上拉加载节流，3秒内最多一次上拉加载
-      const finishPullUp = throttle(this.$refs.scroll.finishPullUp, 3000)
-      finishPullUp()
+      const finishPullUp = throttle(this.$refs.scroll.finishPullUp, 3000);
+      finishPullUp();
       // this.$refs.scroll.finishPullUp()
     },
 
@@ -143,43 +170,43 @@ export default {
       else this.currentType = "sell";
 
       //让两个 tabControl 点击的位置同步
-      this.$refs.tabControl1.currentIndex = index
-      this.$refs.tabControl2.currentIndex = index
+      this.$refs.tabControl1.currentIndex = index;
+      this.$refs.tabControl2.currentIndex = index;
     },
 
     // 返回顶部
-    backClick(){
-      this.$refs.scroll.scrollTo(0,0)
+    backClick() {
+      this.$refs.scroll.scrollTo(0, 0);
     },
 
     // 监听页面滚动
-    contentScroll(position){
-      this.isShowBackTop = -position.y > 1000
+    contentScroll(position) {
+      this.isShowBackTop = -position.y > 1000;
 
       // 决定 tabControl 是否吸顶
-      this.isTabFixed = -position.y > this.tabOffsetTop
+      this.isTabFixed = -position.y > this.tabOffsetTop;
     },
 
     // 上拉加载更多
-    loadMore(){
-        this.getHomeGoods(this.currentType)
+    loadMore() {
+      this.getHomeGoods(this.currentType);
     },
 
     // 监听图片加载完成
-    imageLoad(){
+    imageLoad() {
       // 刷新防抖
-      const refresh = debounce(this.$refs.scroll.refresh, 200)
-      this.$bus.$on('itemImageLoad', () => {
-        refresh()
-      })
+      const refresh = debounce(this.$refs.scroll.refresh, 200);
+      this.$bus.$on("itemImageLoad", () => {
+        refresh();
+      });
     },
 
     // 监听轮播图加载完成
-    swiperImageLoad(){
-        // 2.获取tabControl的offsetTop，滚动到多少时就吸顶
-        // 但图片没加载完成的时候，offsetTop计算不正确
-        // 所有的组件都有一个属性$el:用于获取组件中的元素
-        this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop;
+    swiperImageLoad() {
+      // 2.获取tabControl的offsetTop，滚动到多少时就吸顶
+      // 但图片没加载完成的时候，offsetTop计算不正确
+      // 所有的组件都有一个属性$el:用于获取组件中的元素
+      this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop;
     },
   },
 };
@@ -202,7 +229,6 @@ export default {
   right: 0;
   top: 0;
   z-index: 9; */
-
 }
 
 .tab-control {

@@ -1,6 +1,6 @@
 <template>
   <div class="goods-item">
-    <img :src="goodsItem.show.img" alt="" @load="imageLoad">
+    <img :src="goodsItem.show.img" alt="" @load="imageLoad" @click="itemClick">
     <div class="goods-info">
       <p>{{goodsItem.title}}</p>
       <span class="price">{{goodsItem.price}}</span>
@@ -35,6 +35,11 @@
       // 监听图片加载完成，并发送事件。目的是让 Home 组件监听
       imageLoad(){
         this.$bus.$emit('itemImageLoad')
+      },
+
+      // 点击跳转到详情页
+      itemClick(){
+        this.$router.push(`/detail/${this.goodsItem.iid}`)
       }
     },
   }
