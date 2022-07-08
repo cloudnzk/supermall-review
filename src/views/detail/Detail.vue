@@ -42,6 +42,9 @@ import {
 } from "network/detail";
 import { debounce } from "common/utils";
 import { itemListenerMixin, backTopMixin } from "common/mixin";
+
+import { mapActions } from "vuex";
+
 export default {
   name: "Detail",
   mixins: [itemListenerMixin, backTopMixin],
@@ -92,6 +95,8 @@ export default {
     this.$bus.$off("itemImageLoad", this.itemImgListener);
   },
   methods: {
+    ...mapActions(['addCart']),
+
     async getDetail(iid) {
       const res = await getDetail(iid);
       // console.log(res)
@@ -189,13 +194,19 @@ export default {
       product.image = this.topImages[0];
       product.title = this.goods.title;
       product.desc = this.goods.desc;
-      product.price = this.goods.realPrice;
+      product.price = this.goods.newPrice;
       product.iid = this.iid;
 
       // 2.添加到 Vuex 中
       // this.$store.commit('addCart', product)
+
       // 分发 Action
-      this.$store.dispatch('addCart', product)
+      // this.$store.dispatch('addCart', product)
+      // mapActions 映射到组件的方法上
+      this.addCart(product).then(res =>{
+        // console.log(res);
+        this.$toast.show(res,1500)
+      })
     },
   },
 };

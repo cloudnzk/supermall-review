@@ -6,6 +6,8 @@ export default {
 
   // 操作1：添加商品到购物车
   [ADD_TO_CART](state, payload){
+    // 添加一个 checked 属性，默认选中
+    payload.checked = true
     state.cartList.push(payload)
   },
 
