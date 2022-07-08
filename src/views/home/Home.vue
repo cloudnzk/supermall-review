@@ -52,10 +52,11 @@ import RecommendView from "./childComps/RecommendView";
 
 import { getHomeMultidata, getHomeGoods } from "network/home";
 import { debounce, throttle } from "common/utils";
+import {itemListenerMixin} from "common/mixin"
 
 export default {
   name: "Home",
-  mixins: [],
+  mixins: [itemListenerMixin],
   components: {
     NavBar,
     HomeSwiper,
@@ -95,6 +96,7 @@ export default {
 
       // 保存首页的滚动位置
       saveY: 0,
+      // itemImgListener: null,
     };
   },
   computed: {
@@ -114,7 +116,9 @@ export default {
   mounted() {
     // 监听图片加载的事件使用到了 this.$refs.scroll
     // 所以这部分代码最好放在 mounted 里面，不然 scroll 有可能为空
-    this.imageLoad();
+
+    // 使用 mixins 混入
+    // this.imageLoad();
   },
 
   /* 使用 keep-alive 保存 Home 组件的状态 */
@@ -196,16 +200,20 @@ export default {
     imageLoad() {
       // 刷新防抖
       const refresh = debounce(this.$refs.scroll.refresh, 200);
-      this.$bus.$on("itemImageLoad", () => {
+      // 对监听器进行保存
+      this.itemImgListener = () => {
         refresh();
-      });
+      };
+      this.$bus.$on("itemImageLoad", this.itemImgListener);
+      // 取消监听器
+      // this.$bus.$off("itemImageLoad", this.itemImgListener);
     },
 
     // 监听轮播图加载完成
     swiperImageLoad() {
-      // 2.获取tabControl的offsetTop，滚动到多少时就吸顶
-      // 但图片没加载完成的时候，offsetTop计算不正确
-      // 所有的组件都有一个属性$el:用于获取组件中的元素
+      // 2.获取 tabControl 的 offsetTop，滚动到多少时就吸顶
+      // 但图片没加载完成的时候，offsetTop 计算不正确
+      // 所有的组件都有一个属性 $el: 用于获取组件中的元素
       this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop;
     },
   },

@@ -8,3 +8,52 @@ export function getDetail(iid){
       }
   })
 }
+
+export function getRecommend() {
+  return request({
+    url: '/recommend'
+  })
+}
+
+/**
+ * 商品基本信息类。将数据抽取，并整合放到一个对象里，再传到页面展示
+ */
+ export class Goods {
+  constructor(itemInfo, columns, services) {
+    this.title = itemInfo.title;
+    this.desc = itemInfo.desc;
+    this.newPrice = itemInfo.lowNowPrice;
+    this.oldPrice = itemInfo.oldPrice;
+    this.discount = itemInfo.discountDesc;
+    this.columns = columns;
+    this.services = services;
+    this.nowPrice = itemInfo.highNowPrice;
+  }
+}
+
+
+/**
+ * 店铺基本信息类
+ */
+export class Shop {
+  constructor(shopInfo) {
+      this.logo = shopInfo.shopLogo;
+      this.name = shopInfo.name;
+      this.fans = shopInfo.cFans;
+      this.sells = shopInfo.cSells;
+      this.score = shopInfo.score;
+      this.goodsCount = shopInfo.cGoods
+  }
+}
+
+/**
+ * 商品参数类
+ */
+export class GoodsParam {
+  constructor(info, rule) {
+    // 注: images可能没有值(某些商品有值, 某些没有值)
+    this.image = info.images ? info.images[0] : '';
+    this.infos = info.set;
+    this.sizes = rule.tables;
+  }
+}

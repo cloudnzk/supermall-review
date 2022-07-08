@@ -44,3 +44,38 @@ export function throttle(func, delay) {
     }
   }
 }
+
+// 正则表达式：字符串匹配的利器
+// 常见正则表达式规则：
+  // （1）y+：匹配 1 个或多个 y
+  // （2）y*：0个或多个
+  // （2）y?：0个或1个
+export function formatDate(date, fmt) {
+  // 1.获取年份
+  if (/(y+)/.test(fmt)) {
+    // RegExp.$1 即匹配到的结果
+    // 截取后面的 {RegExp.$1.length} 位。例如 yy，就截取 2 位
+    fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
+  }
+  // 2.获取月、日、时、分、秒
+  let o = {
+    'M+': date.getMonth() + 1,
+    'd+': date.getDate(),
+    'h+': date.getHours(),
+    'm+': date.getMinutes(),
+    's+': date.getSeconds()
+  };
+  for (let k in o) {
+    if (new RegExp(`(${k})`).test(fmt)) {
+      let str = o[k] + '';
+      fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? str : padLeftZero(str));
+    }
+  }
+  return fmt;
+}
+
+// 给 0 - 9 前面加上 0，例如 6:6 -> 06:06
+function padLeftZero(str) {
+  // 巧妙的做法：前面加上 2 个 '0'，再进行截取
+  return ('00' + str).substr(str.length);
+}
