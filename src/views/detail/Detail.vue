@@ -16,7 +16,7 @@
       <good-list ref="recommend" :goods="recommends"></good-list>
     </scroll>
     <back-top @click.native="backTop" v-show="isShowBackTop" />
-    <detail-bottom-bar></detail-bottom-bar>
+    <detail-bottom-bar @addCart="addToCart" />
   </div>
 </template>
 <script>
@@ -180,6 +180,22 @@ export default {
 
       // 3.返回顶部显示
       this.listenShowBackTop(position);
+    },
+
+    // 添加到购物车
+    addToCart() {
+      // 1.获取购物车需要展示的信息
+      const product = {};
+      product.image = this.topImages[0];
+      product.title = this.goods.title;
+      product.desc = this.goods.desc;
+      product.price = this.goods.realPrice;
+      product.iid = this.iid;
+
+      // 2.添加到 Vuex 中
+      // this.$store.commit('addCart', product)
+      // 分发 Action
+      this.$store.dispatch('addCart', product)
     },
   },
 };
