@@ -25,6 +25,7 @@ export const itemListenerMixin = {
   },
 }
 
+// 返回顶部的混入封装
 export const backTopMixin = {
   data() {
     return {

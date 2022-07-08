@@ -1,35 +1,50 @@
 <template>
   <div id="detail">
-    <detail-nav-bar class="detail-nav" />
-    <scroll class="content" ref="scroll" :probe-type="3">
+    <detail-nav-bar class="detail-nav" @titleClick="titleClick" ref="nav" />
+    <scroll
+      class="content"
+      ref="scroll"
+      :probe-type="3"
+      @scroll="contentScroll"
+    >
       <detail-swiper :topImages="topImages" />
       <detail-base-info :goods="goods" />
       <detail-shop-info :shop="shop" />
       <detail-goods-info :detailInfo="detailInfo" @imageLoad="imageLoad" />
-      <detail-param-info :paramInfo="paramInfo"/>
-      <detail-comment-info :commentInfo="commentInfo" />
+      <detail-param-info ref="params" :paramInfo="paramInfo" />
+      <detail-comment-info ref="comment" :commentInfo="commentInfo" />
       <good-list ref="recommend" :goods="recommends"></good-list>
     </scroll>
+    <back-top @click.native="backTop" v-show="isShowBackTop" />
+    <detail-bottom-bar></detail-bottom-bar>
   </div>
 </template>
 <script>
 import Scroll from "../../components/common/scroll/Scroll";
 
-import GoodList from 'components/content/goods/GoodsList'
+import GoodList from "components/content/goods/GoodsList";
 
 import DetailNavBar from "./childComps/DetailNavBar";
 import DetailSwiper from "./childComps/DetailSwiper";
 import DetailBaseInfo from "./childComps/DetailBaseInfo";
 import DetailShopInfo from "./childComps/DetailShopInfo";
 import DetailGoodsInfo from "./childComps/DetailGoodsInfo";
-import DetailParamInfo from "./childComps/DetailParamInfo"
-import DetailCommentInfo from "./childComps/DetailCommentInfo"
+import DetailParamInfo from "./childComps/DetailParamInfo";
+import DetailCommentInfo from "./childComps/DetailCommentInfo";
+import DetailBottomBar from "./childComps/DetailBottomBar";
 
-import { getDetail, getRecommend, Goods, Shop, GoodsParam } from "network/detail";
-import {itemListenerMixin} from "common/mixin"
+import {
+  getDetail,
+  getRecommend,
+  Goods,
+  Shop,
+  GoodsParam,
+} from "network/detail";
+import { debounce } from "common/utils";
+import { itemListenerMixin, backTopMixin } from "common/mixin";
 export default {
   name: "Detail",
-  mixins: [itemListenerMixin],
+  mixins: [itemListenerMixin, backTopMixin],
   components: {
     DetailNavBar,
     DetailSwiper,
@@ -40,6 +55,7 @@ export default {
     DetailParamInfo,
     DetailCommentInfo,
     GoodList,
+    DetailBottomBar,
   },
   props: {},
   data() {
@@ -52,6 +68,10 @@ export default {
       paramInfo: {},
       commentInfo: {},
       recommends: [],
+      // 商品、参数、评论和推荐的 offsetTop
+      themeTopYs: [],
+      getThemeTopY: null,
+      currentIndex: 0,
     };
   },
   computed: {},
@@ -64,12 +84,12 @@ export default {
     this.getDetail(this.iid);
 
     // 详情页推荐信息
-    this.getRecommend()
+    this.getRecommend();
   },
   mounted() {},
   // 为什么这里不能在 deactivated 里取消事件？因为详情页没有缓存，方法无效
   destroyed() {
-      this.$bus.$off('itemImageLoad',this.itemImgListener)
+    this.$bus.$off("itemImageLoad", this.itemImgListener);
   },
   methods: {
     async getDetail(iid) {
@@ -99,21 +119,67 @@ export default {
       );
 
       // 6.获取评论信息
-      if (data.rate.cRate){
-          this.commentInfo = data.rate.list[0]
+      if (data.rate.cRate) {
+        this.commentInfo = data.rate.list[0];
       }
+
+      this.getThemeTopY = debounce(() => {
+        this.themeTopYs = [];
+        this.themeTopYs.push(0);
+        this.themeTopYs.push(this.$refs.params.$el.offsetTop - 44);
+        this.themeTopYs.push(this.$refs.comment.$el.offsetTop - 44);
+        this.themeTopYs.push(this.$refs.recommend.$el.offsetTop - 44);
+        this.themeTopYs.push(Number.MAX_VALUE);
+        //   console.log(this.themeTopYs);
+      }, 100);
     },
 
-    async getRecommend(){
-      const res = await getRecommend()
-      this.recommends = res.data.list
+    async getRecommend() {
+      const res = await getRecommend();
+      this.recommends = res.data.list;
     },
 
     /**
      * 事件监听相关方法
      */
+
+    // 等所有的图片都加载好即触发回调
     imageLoad() {
       this.$refs.scroll.refresh();
+
+      this.getThemeTopY();
+    },
+
+    // 点击标题滚到对应内容
+    titleClick(index) {
+      this.$refs.scroll.scrollTo(0, -this.themeTopYs[index], 100);
+    },
+
+    // 滚动内容显示对应标题
+    contentScroll(position) {
+      // 1.获取y值
+      const positionY = -position.y;
+
+      // 2.positionY 和主题中的 offsetTop 值进行对比
+      let length = this.themeTopYs.length;
+      for (let i = 0; i < length; i++) {
+        // 条件一：防止赋值的过程过于频繁；条件二：判断区间
+        // if(this.currentIndex !== i && (i < length - 1 && positionY >= this.themeTopYs[i] && positionY < this.themeTopYs[i+1]) || (i === length - 1 && positionY >= this.themeTopYs[i])){
+        // 简化判断，在数组多添加一个大的数，避免数组越界
+        if (
+          this.currentIndex !== i &&
+          positionY >= this.themeTopYs[i] &&
+          positionY < this.themeTopYs[i + 1]
+        ) {
+          // console.log(i);
+          this.currentIndex = i;
+          // 传递到 NavBar 组件中
+          this.$refs.nav.currentIndex = this.currentIndex;
+        }
+      }
+
+      // 3.返回顶部显示
+      this.listenShowBackTop(position);
     },
   },
 };
