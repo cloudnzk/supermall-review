@@ -131,9 +131,9 @@ export default {
       this.getThemeTopY = debounce(() => {
         this.themeTopYs = [];
         this.themeTopYs.push(0);
-        this.themeTopYs.push(this.$refs.params.$el.offsetTop - 44);
-        this.themeTopYs.push(this.$refs.comment.$el.offsetTop - 44);
-        this.themeTopYs.push(this.$refs.recommend.$el.offsetTop - 44);
+        this.themeTopYs.push(this.$refs.params.$el.offsetTop);
+        this.themeTopYs.push(this.$refs.comment.$el.offsetTop);
+        this.themeTopYs.push(this.$refs.recommend.$el.offsetTop);
         this.themeTopYs.push(Number.MAX_VALUE);
         //   console.log(this.themeTopYs);
       }, 100);
@@ -231,6 +231,6 @@ export default {
   top: 44px;
   bottom: 58px; */
   /* 使用 100% 必须给父元素设置高度 */
-  height: calc(100% - 44px);
+  height: calc(100% - 44px - 58px);
 }
 </style>

@@ -10,12 +10,12 @@ export default {
       if(product){
         // 提交一个 mutations
         context.commit(ADD_COUNTER, product)
-        resolve('添加商品到购物车成功')
+        resolve('商品数量加一')
       }
       else{
         payload.count = 1
         context.commit(ADD_TO_CART, payload)
-        resolve('商品数量加一')
+        resolve('添加商品到购物车成功')
       }
     })
   }

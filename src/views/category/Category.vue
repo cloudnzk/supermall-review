@@ -1,6 +1,7 @@
 <template>
-  <div class="wrapper">
-    <ul class="content">
+  <div class="">
+    分类
+    <!-- <ul class="content">
       <li>分类列表1</li>
       <li>分类列表1</li>
       <li>分类列表1</li>
@@ -37,7 +38,7 @@
       <li>分类列表1</li>
       <li>分类列表1</li>
       <li>分类列表1</li>
-    </ul>
+    </ul> -->
   </div>
 </template>
 <script>
