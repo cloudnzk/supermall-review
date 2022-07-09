@@ -5,6 +5,9 @@ import store from './store'
 
 import toast from 'components/common/toast'
 
+import FastClick from 'fastclick'
+
+import VueLazyload from 'vue-lazyload'
 // import './assets/css/index.css'
 // import './assets/tailwind.css'
 
@@ -17,6 +20,15 @@ Vue.prototype.$bus = new Vue()
 
 // 安装toast插件
 Vue.use(toast)
+
+// fastclick 解决 300ms 延迟
+FastClick.attach(document.body);
+
+// 安装懒加载插件
+Vue.use(VueLazyload,{
+  // 在JS中怎么导入图片？require或者import
+  loading: require('./assets/img/common/placeholder.png')
+})
 
 new Vue({
   router,
