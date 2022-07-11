@@ -219,6 +219,7 @@ export default {
   background-color: #fff;
   /* 给滚动区域的父元素设置具体高度，否则是根据内容撑开 */
   height: 100vh;
+  width: 100vw;
 }
 .detail-nav {
   /* 如果可以用相对定位，尽量用。因为相对定位会保持在原来的位置，不脱标 */
@@ -227,10 +228,11 @@ export default {
   background-color: #fff;
 }
 .content {
-  /* position: absolute;
+  width: 100%;
+  position: absolute;
   top: 44px;
-  bottom: 58px; */
+  bottom: 58px;
   /* 使用 100% 必须给父元素设置高度 */
-  height: calc(100% - 44px - 58px);
+  /* height: calc(100% - 44px - 58px); */
 }
 </style>
