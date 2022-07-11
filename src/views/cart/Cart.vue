@@ -24,7 +24,7 @@ export default {
   },
   computed: {
     //将 store 中的 getter 映射到局部计算属性：
-    ...mapGetters(['cartList','cartLength'])
+    ...mapGetters(["cartList", "cartLength"]),
 
     // ...mapGetters({
     //   cartList: "cartList",
@@ -53,12 +53,10 @@ export default {
   color: #fff;
 }
 
-/*
-  .cart-list {
-    position: absolute;
-    top: 44px;
-    bottom: 49px;
-    width: 100%;
-  }
-  */
+.cart-list {
+  position: absolute;
+  top: 44px;
+  bottom: 49px;
+  width: 100%;
+}
 </style>
