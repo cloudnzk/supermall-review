@@ -5,7 +5,7 @@ import store from './store'
 
 import toast from 'components/common/toast'
 
-import FastClick from 'fastclick'
+// import FastClick from 'fastclick'
 
 import VueLazyload from 'vue-lazyload'
 // import './assets/css/index.css'
@@ -22,7 +22,8 @@ Vue.prototype.$bus = new Vue()
 Vue.use(toast)
 
 // fastclick 解决 300ms 延迟
-FastClick.attach(document.body);
+// 其实现在的浏览器解决了这个问题，而且 fastclick 很久不更新了。所以没有必要使用了
+// FastClick.attach(document.body);
 
 // 安装懒加载插件
 Vue.use(VueLazyload,{
