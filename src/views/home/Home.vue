@@ -24,7 +24,7 @@
     >
       <home-swiper :banners="banners" @swiperImageLoad="swiperImageLoad" />
       <recommend-view :recommends="recommends" />
-      <!-- <feature-view/> -->
+      <feature-view/>
       <!-- 子组件传给父组件的数据，在模板里不用再给监听的方法传参数。例如，tabClick(index)反而会出错 -->
       <tab-control
         class="tab-control"
@@ -32,7 +32,7 @@
         @tabClick="tabClick"
         ref="tabControl2"
       />
-      <goods-list :goods="showGoods" />
+      <goods-list :goods="showGoods"/>
     </scroll>
     <!-- 监听一个组件的原生事件，需要加上 .native 修饰符 -->
     <back-top @click.native="backClick" v-show="isShowBackTop" />
@@ -48,7 +48,7 @@ import BackTop from "../../components/content/backTop/BackTop";
 
 import HomeSwiper from "./childComps/HomeSwiper";
 import RecommendView from "./childComps/RecommendView";
-// import FeatureView from './childComps/FeatureView'
+import FeatureView from './childComps/FeatureView'
 
 import { getHomeMultidata, getHomeGoods } from "network/home";
 import { debounce, throttle } from "common/utils";
@@ -61,7 +61,7 @@ export default {
     NavBar,
     HomeSwiper,
     RecommendView,
-    // FeatureView,
+    FeatureView,
     TabControl,
     GoodsList,
     Scroll,
@@ -97,6 +97,11 @@ export default {
       // 保存首页的滚动位置
       saveY: 0,
       // itemImgListener: null,
+      tabY:{
+        pop: 0,
+        new: 0,
+        sell: 0
+      }
     };
   },
   computed: {
@@ -169,6 +174,8 @@ export default {
      * 事件监听相关的方法
      */
     tabClick(index) {
+      // this.tabY[this.currentType] = this.$refs.scroll.getCurrentY();
+
       if (index === 0) this.currentType = "pop";
       else if (index === 1) this.currentType = "new";
       else this.currentType = "sell";
@@ -176,6 +183,9 @@ export default {
       //让两个 tabControl 点击的位置同步
       this.$refs.tabControl1.currentIndex = index;
       this.$refs.tabControl2.currentIndex = index;
+
+      // this.backClick()
+      this.$refs.scroll.scrollTo(0, - this.tabOffsetTop);
     },
 
     // 返回顶部
