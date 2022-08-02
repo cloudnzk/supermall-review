@@ -165,7 +165,7 @@ export default {
 
       // 数据保存完成，完成上拉加载更多，允许下一次上拉加载
       // 上拉加载节流，3秒内最多一次上拉加载
-      const finishPullUp = throttle(this.$refs.scroll.finishPullUp, 3000);
+      const finishPullUp = throttle(this.$refs.scroll.finishPullUp, 1500);
       finishPullUp();
       // this.$refs.scroll.finishPullUp()
     },
