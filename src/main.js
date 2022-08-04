@@ -26,10 +26,28 @@ Vue.use(toast)
 // FastClick.attach(document.body);
 
 // 安装懒加载插件
-Vue.use(VueLazyload,{
+Vue.use(VueLazyload, {
   // 在JS中怎么导入图片？require或者import
   loading: require('./assets/img/common/placeholder.png')
 })
+
+Vue.directive("lazyload", {
+  // 指令的定义
+  bind: function (el, binding) {
+    let lazyImageObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        let lazyImage = entry.target;
+        // 相交率，默认是相对于浏览器视窗
+        if (entry.intersectionRatio > 0) {
+          lazyImage.src = binding.value;
+          // 当前图片加载完之后需要去掉监听
+          lazyImageObserver.unobserve(lazyImage);
+        }
+      })
+    })
+    lazyImageObserver.observe(el);
+  },
+});
 
 new Vue({
   router,

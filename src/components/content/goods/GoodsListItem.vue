@@ -1,7 +1,7 @@
 <template>
   <div class="goods-item">
     <img
-      v-lazy="showImg"
+      v-lazyload="showImg"
       alt=""
       @load="imageLoad"
       @click="itemClick"
