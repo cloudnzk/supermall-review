@@ -14,16 +14,6 @@
     </tab-control>
 
     <!-- content 样式会被加到自定义组件的根div上 -->
-
-    <!-- 使用自己实现的上拉加载-->
-    <!-- <scroll
-      class="content"
-      ref="scroll"
-      @scroll="contentScroll"
-      :probe-type="3"
-    > -->
-
-    <!-- 使用 better-scroll 的上拉加载插件-->
     <scroll
       class="content"
       ref="scroll"
@@ -34,7 +24,7 @@
     >
       <home-swiper :banners="banners" @swiperImageLoad="swiperImageLoad" />
       <recommend-view :recommends="recommends" />
-      <feature-view />
+      <feature-view/>
       <!-- 子组件传给父组件的数据，在模板里不用再给监听的方法传参数。例如，tabClick(index)反而会出错 -->
       <tab-control
         class="tab-control"
@@ -42,12 +32,7 @@
         @tabClick="tabClick"
         ref="tabControl2"
       />
-      <goods-list :goods="showGoods" />
-
-      <!-- 上拉加载组件 -->
-      <!-- <load-more @loadMore="loadMore">
-        <p class="loading">loading...</p>
-      </load-more> -->
+      <goods-list :goods="showGoods"/>
     </scroll>
     <!-- 监听一个组件的原生事件，需要加上 .native 修饰符 -->
     <back-top @click.native="backClick" v-show="isShowBackTop" />
@@ -56,7 +41,6 @@
 <script>
 import NavBar from "components/common/navbar/NavBar";
 import Scroll from "../../components/common/scroll/Scroll";
-// import LoadMore from "../../components/common/loadMore/LoadMore";
 
 import TabControl from "../../components/content/tabControl/TabControl";
 import GoodsList from "../../components/content/goods/GoodsList";
@@ -64,11 +48,11 @@ import BackTop from "../../components/content/backTop/BackTop";
 
 import HomeSwiper from "./childComps/HomeSwiper";
 import RecommendView from "./childComps/RecommendView";
-import FeatureView from "./childComps/FeatureView";
+import FeatureView from './childComps/FeatureView'
 
 import { getHomeMultidata, getHomeGoods } from "network/home";
 import { debounce, throttle } from "common/utils";
-import { itemListenerMixin } from "common/mixin";
+import {itemListenerMixin} from "common/mixin"
 
 export default {
   name: "Home",
@@ -82,7 +66,6 @@ export default {
     GoodsList,
     Scroll,
     BackTop,
-    // LoadMore,
   },
   props: {},
   data() {
@@ -114,11 +97,11 @@ export default {
       // 保存首页的滚动位置
       saveY: 0,
       // itemImgListener: null,
-      tabY: {
+      tabY:{
         pop: 0,
         new: 0,
-        sell: 0,
-      },
+        sell: 0
+      }
     };
   },
   computed: {
@@ -138,6 +121,7 @@ export default {
   mounted() {
     // 监听图片加载的事件使用到了 this.$refs.scroll
     // 所以这部分代码最好放在 mounted 里面，不然 scroll 有可能为空
+
     // 使用 mixins 混入
     // this.imageLoad();
   },
@@ -180,7 +164,7 @@ export default {
       this.goods[type].page += 1;
 
       // 数据保存完成，完成上拉加载更多，允许下一次上拉加载
-      // 上拉加载节流，1.5秒内最多一次上拉加载
+      // 上拉加载节流，3秒内最多一次上拉加载
       const finishPullUp = throttle(this.$refs.scroll.finishPullUp, 1500);
       finishPullUp();
       // this.$refs.scroll.finishPullUp()
@@ -201,7 +185,7 @@ export default {
       this.$refs.tabControl2.currentIndex = index;
 
       // this.backClick()
-      this.$refs.scroll.scrollTo(0, -this.tabOffsetTop);
+      this.$refs.scroll.scrollTo(0, - this.tabOffsetTop);
     },
 
     // 返回顶部
@@ -278,9 +262,5 @@ export default {
   left: 0;
   right: 0;
   /* height: calc(100% - 44px - 49px); */
-}
-.loading{
-  text-align: center;
-  font-size: 16px;
 }
 </style>
